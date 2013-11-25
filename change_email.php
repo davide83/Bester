@@ -25,6 +25,7 @@ require_once("class/User.class.php");
 require_once("class/Category.class.php");
 require_once("class/Bet.class.php");
 require_once("class/Logger.class.php");
+require_once("class/Mailer.class.php");
 require_once("class/Transaction.class.php");
 require_once("class/DbMapper.class.php");
 require_once("class/Site.class.php");
@@ -64,7 +65,7 @@ if ($session->getState() &&
 		$encoded_email = base64_encode($email);
 		$conf_link = $bstConfig_url."confirm_email.php?cn=".$conf_num.
 			"&un=".$user->getUsername()."&al=".$encoded_email;
-		Mailer(_CHANGE_EMAIL_SUB, _CHANGE_EMAIL_MSG."\n"."\n".$conf_link."\n\n", $email);
+		$mailer->send_email(_CHANGE_EMAIL_SUB, _CHANGE_EMAIL_MSG."\n"."\n".$conf_link."\n\n", $email);
 		$logger->writeLog($username, _CHANGE_EMAIL_SENT.$email);
 		$mainhtml = replace("Message1", _EMAIL_CONF_MSG_SENT, $mainhtml);
 	}

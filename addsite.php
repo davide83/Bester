@@ -44,6 +44,19 @@ require_once ('modules/title.php');
 
 // 5. mainhtml
 if ($user->getStatus() == "administrator") {
+	
+	if (!isset($_POST['preview']))
+		$_POST['preview'] = "";
+		
+	if (!isset($_POST['insert']))
+		$_POST['insert'] = "";
+
+	if (!isset($_POST['title']))
+		$_POST['title'] = "";
+	
+	if (!isset($_GET['sid']))
+		$_GET['sid'] = "";
+	
 	if (isset($_GET['sid']) && ($_POST['preview'] == "") && ($_POST['insert'] == "")){
 		$sid = htmlspecialchars($_GET['sid']);
 		$site = $db_mapper->getSite($sid);
@@ -54,6 +67,8 @@ if ($user->getStatus() == "administrator") {
 		$mainhtml = replace("Text", $site->getText(), $mainhtml);
 		$mainhtml = replace("Date", $site->getDate(), $mainhtml);
 	}
+	
+	/*
 	elseif (($_POST['insert'] == "insert") && (!isset($_GET['sid']))){
 		if (isset($_POST['text']) && isset($_POST['title'])){
 			$sitetitle = $_POST['title'];
@@ -67,12 +82,15 @@ if ($user->getStatus() == "administrator") {
 			$mainhtml = replace("Date", $site->getDate(), $mainhtml);
 		}
 	}
+	*/
+	
+
 	elseif (($_POST['insert'] == "insert") && (isset($_GET['sid']))){
 		if (isset($_POST['text']) && isset($_POST['title'])){
 			$sitetitle = $_POST['title'];
 			$text = $_POST['text'];
 			$sid = $_GET['sid'];
-			$site = new Site($sid, $sitetitle, $text, $author, $date);
+			$site = new Site($sid, $sitetitle, $text, "", "");
 			$db_mapper->updateSite($site);
 			$logger->writeLog($user->getUsername(), _SITE_CHANGED.$sitetitle);
 			$mainhtml = file_get_contents("tpl/showsite.inc");

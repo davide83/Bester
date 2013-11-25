@@ -25,6 +25,7 @@ require_once("class/User.class.php");
 require_once("class/Category.class.php");
 require_once("class/Bet.class.php");
 require_once("class/Logger.class.php");
+require_once("class/Mailer.class.php");
 require_once("class/Transaction.class.php");
 require_once("class/DbMapper.class.php");
 require_once("class/Site.class.php");
@@ -77,7 +78,7 @@ if (($session->getState() == 0) &&
 			if ($xuser->getEmail() == $email){
 				$conf_num = $db_mapper->getUserConfNum($xusername);
 				$conf_link = $bstConfig_url."forgot_pwd.php?cn=".$conf_num."&un=".$xusername;
-				Mailer(_FORGOT_PWD_SUB, _FORGOT_PWD_MSG."\n\n".$conf_link."\n", $email);	
+				$mailer->send_email(_FORGOT_PWD_SUB, _FORGOT_PWD_MSG."\n\n".$conf_link."\n", $email);	
 				$logger->writeLog($xusername, _FORGOT_PWD);
 				$mainhtml = replace("Message1", _FORGOT_PWD_MAIL_SENT, $mainhtml);       
 				$mainhtml = replace("Back", _BACK_HOME, $mainhtml); 

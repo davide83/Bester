@@ -80,7 +80,7 @@ if (isset($_GET["pn"]) && is_numeric(htmlspecialchars($_GET['pn']))) {
 		$page_num = htmlspecialchars($_GET['pn']);
 }
 else {
-		$page_num = 0;
+		$page_num = 1;
 }
 		
 $num_pages = ceil($bet_num/$size);

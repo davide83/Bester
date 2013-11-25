@@ -17,46 +17,50 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  */
 
-require_once("configuration.php");
+require('configuration.php');
 require("class/phpmailer.class.php");
-
-require_once("class/DbMapper.class.php");
-
-$mail = new PHPMailer();
-
-class Mailer {
-
-	function Mailer($subject,$message,$receivers){
+//require_once("class/DbMapper.class.php");
 
 
-	$mail->From     = CONTACT_MAIL;
-	$mail->FromName = SENDER;
-	$mail->Host     = MAIL_HOST;
-	$mail->Mailer   = "smtp";
 
-	$mail->IsSMTP();
-	$mail->SMTPAuth = true;
-	$mail->Username = SMTP_USERNAME;
-	$mail->Password = SMTP_PASSWORD;
+class Mailer extends PHPMailer {
 
-	$mail->Body    = $message.SIGNATURE;
-	$mail->Subject = $subject;
-	$mail->AltBody = $text_body;
-	$mail->AddAddress(CONTACT_MAIL, "");
+	//var $mail = new PHPMailer();
+	
+	function Mailer(){
+	}
+	
+	function send_email($subject,$message,$receivers){
+
+
+	$this->From     = CONTACT_MAIL;
+	$this->FromName = SENDER;
+	$this->Host     = MAIL_HOST;
+	$this->Mailer   = "smtp";
+
+	$this->IsSMTP();
+	$this->SMTPAuth = true;
+	$this->Username = SMTP_USERNAME;
+	$this->Password = SMTP_PASSWORD;
+
+	$this->Body    = $message.SIGNATURE;
+	$this->Subject = $subject;
+	$this->AltBody = $text_body;
+	$this->AddAddress(CONTACT_MAIL, "");
 
 	$receivers_array = split(',',$receivers);
 	foreach($receivers_array as $receiver){
-		$mail->AddBCC(trim($receiver));
+		$this->AddBCC(trim($receiver));
 	}
 
-	if(!$mail->Send()) {
+	if(!$this->Send()) {
 		return false;
 	}
 	else return true;
 
 	// Clear all addresses and attachments for next loop
-	$mail->ClearAddresses();
-	$mail->ClearAttachments();
+	$this->ClearAddresses();
+	$this->ClearAttachments();
 }
 	
 }

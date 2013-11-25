@@ -53,6 +53,7 @@ require_once ('modules/catmenu.php');
 require_once ('modules/title.php');
 
 // 5. mainhtml
+$log_html_part = "";
 if ($session->getState() && 
 	(($user->getStatus() == "administrator") || 
 	 ($user->getStatus() == "betmaster"))){
@@ -104,7 +105,7 @@ if ($session->getState() &&
 		}
 
 		for ($log_counter = $start_num; $log_counter <= $disp_num-1; $log_counter++ ){
-			if ($i < $log_num){
+			//if ($i < $log_num){
 				$log_html_part .= getTemplatePart("Logs", $mainhtml);
 				$log_html_part = replace("Id", mysql_result($result, $log_counter, "id"), $log_html_part);
 				$log_html_part = replace("RemoteAddress", mysql_result($result, $log_counter, "rem_addr"), $log_html_part);
@@ -113,7 +114,7 @@ if ($session->getState() &&
 				$log_html_part = replace("Event", mysql_result($result, $log_counter, "event"), $log_html_part);    
 				$log_html_part = replace("RemoteAgent", mysql_result($result, $log_counter, "rem_agt"), $log_html_part);      
 				$log_html_part = replace("DateTime", mysql_result($result, $log_counter, "time"), $log_html_part); 
-			}
+			//}
 		}
 
 

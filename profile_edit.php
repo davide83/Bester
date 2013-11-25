@@ -85,6 +85,9 @@ if ($session->getState()){
 	$mainhtml = replace("ButtonInsertValue", _EDIT, $mainhtml);
 	$mainhtml = replace("ButtonDeleteValue", _DELETE, $mainhtml);
 
+	if (!isset($_POST['insert1']))
+		$_POST['insert1'] = "";
+	
 	// print $db_mapper->checkIfUserInDB($session->getUsername(), "baidl");
 	if (htmlspecialchars($_POST['insert1']) == _EDIT){
 		$password_old = $_POST['pwd_old'];

@@ -55,6 +55,51 @@ require_once ('modules/title.php');
 if (($user->getStatus() == "administrator") || 
 	($user->getStatus() == "betmaster")){
 	
+	if (!isset($_POST['go1']))
+		$_POST['go1'] = "";
+
+	if (!isset($_POST['go2']))
+		$_POST['go2'] = "";
+
+	if (!isset($_POST['go3']))
+		$_POST['go3'] = "";
+
+	if (!isset($_POST['go4']))
+		$_POST['go4'] = "";	
+
+	if (!isset($_POST['back2']))
+		$_POST['back2'] = "";	
+	
+	if (!isset($_POST['back3']))
+		$_POST['back3'] = "";	
+
+	if (!isset($_POST['back4']))
+		$_POST['back4'] = "";	
+	
+	if (!isset($_POST['continue2']))
+		$_POST['continue2'] = "";	
+	
+	if (!isset($_POST['continue3']))
+		$_POST['continue3'] = "";	
+	
+	if (!isset($_POST['continue4']))
+		$_POST['continue4'] = "";	
+	
+	if (!isset($_POST['delete1']))
+		$_POST['delete1'] = "";	
+		
+	if (!isset($_POST['delete2']))
+		$_POST['delete2'] = "";		
+	
+	if (!isset($_POST['delete3']))
+		$_POST['delete3'] = "";	
+	
+	if (!isset($_POST['delete4']))
+		$_POST['delete4'] = "";	
+
+	if (!isset($_POST['delete_def']))
+		$_POST['delete_def'] = "";	
+	
 	// after the first go "click"
 	if ($_POST['go1'] == _GO){
 		$new_bet = unserialize($_SESSION['newbet']);
@@ -100,6 +145,7 @@ if (($user->getStatus() == "administrator") ||
 			$new_bet->setBetStartTime($_POST['startdate']);
 			$new_bet->setBetEndTime($_POST['enddate']);
 	
+			$pos_array = "";
 			if (count($new_bet->getPossibilitiesNames()) == $_POST['posnr']){
 				$pos_array = $new_bet->getPossibilitiesNames();
 			}
@@ -111,6 +157,7 @@ if (($user->getStatus() == "administrator") ||
 			}
 	
 			$i = 0;
+			$pos_part = "";
 			foreach ($pos_array as $pos_name){
 				$pos_part .= getTemplatePart("Possibilities", $mainhtml);
 				$pos_part = replace("Pos", _POSSIBILITY." ".($i+1), $pos_part); 
@@ -151,6 +198,7 @@ if (($user->getStatus() == "administrator") ||
 
 
 			// fill select-menu
+			$select_item = "";
 			for ($k = 2; $k <= MAX_BET_POS_AMOUNT; $k++){
 
 				$select_item .= getTemplatePart("SelectItem", $mainhtml);
@@ -210,6 +258,7 @@ if (($user->getStatus() == "administrator") ||
 			$categories = $db_mapper->getAllCategories();
 
 			// display categories
+			$cat_html_part = "";
 			foreach($categories as $category) {
 				$cat_html_part .= getTemplatePart("Categories", $mainhtml);
 				$cat_html_part = replace("CategoryID", $category->getCategoryId(), $cat_html_part);
@@ -271,6 +320,9 @@ if (($user->getStatus() == "administrator") ||
 		// unlock F5
 		$session->unlockF5();
 
+		if (!isset($_POST['category'] ))
+			$_POST['category'] = "";
+			
 		if (!($_POST['category'] == "")){
 			
 			$new_bet = unserialize($_SESSION['newbet']);
@@ -336,6 +388,7 @@ if (($user->getStatus() == "administrator") ||
 			$categories = $db_mapper->getAllCategories();
 
 			// display categories
+			$cat_html_part = "";
 			foreach($categories as $category) {
 				$cat_html_part .= getTemplatePart("Categories", $mainhtml);
 				$cat_html_part = replace("CategoryID", $category->getCategoryId(), $cat_html_part);
@@ -456,6 +509,7 @@ if (($user->getStatus() == "administrator") ||
 		
 		$pos_amount = count($new_bet->getPossibilitiesIds());
 		// fill select-menu
+		$select_item = "";
 		for ($k = 2; $k <= MAX_BET_POS_AMOUNT; $k++){
 
 			$select_item .= getTemplatePart("SelectItem", $mainhtml);
@@ -480,7 +534,8 @@ if (($user->getStatus() == "administrator") ||
 		$new_bet = unserialize($_SESSION['newbet']);
 		$pos_array = $new_bet->getPossibilitiesNames(); 
 
-		$i = 0;		
+		$i = 0;	
+		$pos_part = "";
 		foreach ($pos_array as $pos_name){
 			$pos_part .= getTemplatePart("Possibilities", $mainhtml);
 			$pos_part = replace("Pos", _POSSIBILITY." ".($i+1), $pos_part); 
@@ -559,7 +614,8 @@ if (($user->getStatus() == "administrator") ||
 
 		$new_bet = unserialize($_SESSION['newbet']);
 		
-				// fill select-menu
+		// fill select-menu
+		$select_item = "";
 		for ($k = 2; $k <= MAX_BET_POS_AMOUNT; $k++){
 
 			$select_item .= getTemplatePart("SelectItem", $mainhtml);
@@ -636,6 +692,7 @@ if (($user->getStatus() == "administrator") ||
 			$mainhtml = replace("PosNr", _INSERT_BET_POS_NR, $mainhtml);
 			
 			// fill select-menu
+			$select_item = "";
 			for ($k = 2; $k <= MAX_BET_POS_AMOUNT; $k++){
 
 				$select_item .= getTemplatePart("SelectItem", $mainhtml);

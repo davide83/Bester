@@ -73,12 +73,12 @@ if (($session->getState()) &&
 	$user_area_part = replace("EditProfile", 
 			"<p><a href=\"profile_edit.php\">"
 			._EDIT_PROFILE."</a></p>", $user_area_part);
-	if (($user->getStatus() == "betmaster") || ($user->getStatus() == "administrator")){
-		$user_area_part = replace("CreateBet", "<p><a href=\"insertbet.php\">"._INSERT_BET."</a></p>", $user_area_part);
-	}
-	else {
-		$user_area_part = replace("CreateBet", "", $user_area_part);
-	}
+	//if (($user->getStatus() == "betmaster") || ($user->getStatus() == "administrator")){
+	//	$user_area_part = replace("CreateBet", "<p><a href=\"insertbet.php\">"._INSERT_BET."</a></p>", $user_area_part);
+	//}
+	//else {
+	//	$user_area_part = replace("CreateBet", "", $user_area_part);
+	//}
 	$mainhtml = replace("UserArea", $user_area_part, $mainhtml);
 
 

@@ -19,47 +19,48 @@
 
 require_once("configuration.php");
 require("class/phpmailer.class.php");
+//require_once("class/DbMapper.class.php");
 
-require_once("class/DbMapper.class.php");
 
-$mail = new PHPMailer();
 
-class Mailer {
+class Mailer extends PHPMailer {
 
+	//var $mail = new PHPMailer();
+	
 	function Mailer(){
 	}
 	
 	function send_email($subject,$message,$receivers){
 
 
-	$mail->From     = CONTACT_MAIL;
-	$mail->FromName = SENDER;
-	$mail->Host     = MAIL_HOST;
-	$mail->Mailer   = "smtp";
+	$this->From     = CONTACT_MAIL;
+	$this->FromName = SENDER;
+	$this->Host     = MAIL_HOST;
+	$this->Mailer   = "smtp";
 
-	$mail->IsSMTP();
-	$mail->SMTPAuth = true;
-	$mail->Username = SMTP_USERNAME;
-	$mail->Password = SMTP_PASSWORD;
+	$this->IsSMTP();
+	$this->SMTPAuth = true;
+	$this->Username = SMTP_USERNAME;
+	$this->Password = SMTP_PASSWORD;
 
-	$mail->Body    = $message.SIGNATURE;
-	$mail->Subject = $subject;
-	$mail->AltBody = $text_body;
-	$mail->AddAddress(CONTACT_MAIL, "");
+	$this->Body    = $message.SIGNATURE;
+	$this->Subject = $subject;
+	$this->AltBody = $text_body;
+	$this->AddAddress(CONTACT_MAIL, "");
 
 	$receivers_array = split(',',$receivers);
 	foreach($receivers_array as $receiver){
-		$mail->AddBCC(trim($receiver));
+		$this->AddBCC(trim($receiver));
 	}
 
-	if(!$mail->Send()) {
+	if(!$this->Send()) {
 		return false;
 	}
 	else return true;
 
 	// Clear all addresses and attachments for next loop
-	$mail->ClearAddresses();
-	$mail->ClearAttachments();
+	$this->ClearAddresses();
+	$this->ClearAttachments();
 }
 	
 }

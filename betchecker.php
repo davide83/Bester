@@ -25,6 +25,7 @@ require_once("class/User.class.php");
 require_once("class/Category.class.php");
 require_once("class/Bet.class.php");
 require_once("class/Logger.class.php");
+require_once("class/Mailer.class.php");
 require_once("class/Transaction.class.php");
 require_once("class/DbMapper.class.php");
 require_once("class/Site.class.php");
@@ -35,6 +36,7 @@ require_once("class/phpmailer.class.php");
 // objects
 $session = new Session;
 $logger = new Logger;
+$mailer = new Mailer;
 $db_mapper = new DbMapper;
 $user = new User("", "", "", "", "", "", "");
 
@@ -53,27 +55,25 @@ require_once ('modules/catmenu.php');
 require_once ('modules/title.php');
 
 // 5. mainhtml
-
-
 $mainhtml = file_get_contents("tpl/betchecker.inc");
 
 function checkValues($bstConfig_state){
 
-	$pos = htmlspecialchars($_POST['pos']);
-
-	if ($bstConfig_state == "closed")
+	if ($bstConfig_state == "closed") {
 		return 3;	
-
-	elseif (isset($_POST['pos']) && isset($_POST['credits']))
+	}
+	elseif (isset($_POST['pos']) && isset($_POST['credits'])) {
 		$credits = htmlspecialchars($_POST['credits']);			
-		if (is_numeric($credits) && (intval($credits) == floatval($credits))){
+		if (is_numeric($credits) && (intval($credits) == floatval($credits))) {
 			return 1;
 		}
-	elseif (isset($_GET['pos']) && isset($_GET['cd']))
+	}
+	elseif (isset($_GET['pos']) && isset($_GET['cd'])) {
 		$credits = htmlspecialchars($_GET['cd']);
 		if (is_numeric($credits) && (intval($credits) == floatval($credits))){
 			return 2;
 		}
+	}
 	else 
 		return 0;
 }
@@ -96,105 +96,138 @@ function checkUserStatus($session, $user){
 		return false;
 }
 
+//print checkUserStatus($session, $user);
+$wrong_pos = true;
+$low_balance = true;
+$wrong_time = true;
 
 if(checkUserStatus($session, $user)){
 
-	$id_array = explode("#",$pos);
-	$bet_id = $id_array[0];
-	$bet = $db_mapper->getBet($bet_id);
 	$cont_flag = checkValues($bstConfig_state);
 
-	if (($cont_flag > 0) && ($bet->getBetEndTime() > strtotime(time()))){
+	if ($cont_flag == 1) {
+		// ask confirmation
+		$pos = htmlspecialchars($_POST['pos']);
+		$credits = htmlspecialchars($_POST['credits']);
+		
+		// check posibility
+		if(checkPossibility($db_mapper, $user, $pos)){
+			$wrong_pos = false;
+		}
+		
+		// check balance
 		if(checkBalance($user, $credits)){
-			if(checkPossibility($db_mapper, $user, $pos)){
-				// success 
-				if ($cont_flag == 1){
-					// ask confirmation
-					$pos = htmlspecialchars($_POST['pos']);
-					$credits = htmlspecialchars($_POST['credits']);
-					$session->unlockF5();
-					$id_array = explode("#",$pos);
-					$bet_id = $id_array[0];
-					$possibility_id = $id_array[1];
-					$pos = $bet_id."%23".$possibility_id;
-					$bet = $db_mapper->getBet($bet_id);
-					$quote = $db_mapper->getQuoteFromPosId($possibility_id, $credits);
-					$win_credits = round(($quote * $credits), 0); 
-					$new_balance = $user->getBalance() - $credits;
-					$possibility_name = $db_mapper->getPossibilityNameFromId($possibility_id);
-					$mainhtml = replace("Message1", _BET_PROPOSITION, $mainhtml);
-					$line1 = getTemplatePart("Text", $mainhtml);
-					$line1 = replace("Line", _BET.": ".$bet->getBetTitle(), $line1);
-					$line2 = getTemplatePart("Text", $mainhtml);
-					$line2 = replace("Line", _POSSIBILITY.": ".$possibility_name.": ".$bet->getBetTitle(), $line2);
-					$line3 = getTemplatePart("Text", $mainhtml);
-					$line3 = replace("Line", "Credits: ".$credits, $line3);
-					$line4 = getTemplatePart("Text", $mainhtml);
-					$line4 = replace("Line", _BET_WIN_CASE.$win_credits." Credits" , $line4);
-					$line5 = getTemplatePart("Text", $mainhtml);
-					$line5 = replace("Line", _BET_BALANCE_AFTER.$new_balance." Credits" , $line5);
-					$line6 = getTemplatePart("Text", $mainhtml);
-					$line6 = replace("Line", _BET_ASSICURATION , $line6);
-					$mainhtml = replace("Text", $line1.$line2.$line3.$line4.$line5.$line6, $mainhtml);
-					$mainhtml = replace("Link1", "<a href=\"betchecker.php?pos=$pos&cd=$credits\">"._BET_CONTINUE."</a>" , $mainhtml);
-					$mainhtml = replace("Link2", "<a href=\"index.php\">"._BET_DELETE."</a>" , $mainhtml);
-				}
-				else if ($cont_flag == 2){
-					// show confirmation
-					$pos = htmlspecialchars($_GET['pos']);
-					$credits = htmlspecialchars($_GET['cd']);
-					$id_array = explode("#",$pos);
-					$bet_id = $id_array[0];
-					$pos_id = $id_array[1];
-					$bet = $db_mapper->getBet($bet_id);
-					$bet->execute($pos_id, $credits, $user);
-					$pos_name = $db_mapper->getPossibilityNameFromId($pos_id);
-					
-					Mailer(_BET_SUB, _BET_MSG."\n"
-							._BET.": ".$bet->getBetTitle()."\n"."\n"
-							._POSSIBILITY.": ".$pos_name."\n"
-							._CREDITS.": ".$credits."\n", $user->getEmail());
-					
-					$session->lockF5();
-					
-					$mainhtml = replace("Message1", _BET_ACCEPTED, $mainhtml);
-					$mainhtml = replace("Text", "", $mainhtml);
-					$mainhtml = replace("Link1", "", $mainhtml);
-					$mainhtml = replace("Link2", "<a href=\"index.php\">"._BET_BACK."</a>" , $mainhtml); 
-				}
-				else if ($cont_flag == 3){
-					// office closed or wrong time
-					$mainhtml = file_get_contents("tpl/closed.inc");
-					$mainhtml = replace("Message1", _BET_OFFICE_CLOSED, $mainhtml);
-					$mainhtml = replace("Back", _BACK_HOME, $mainhtml);
-				}
-			}
-			else {
-				// wrong possibility
-				$id_array = explode("#",$pos);
-				$bet_id = $id_array[0];
-				$possibility_id = $id_array[1];
-				$bet = $db_mapper->getBet($bet_id);
-				$possibility_name = $db_mapper->getPossibilityNameFromId($possibility_id);
-				$mainhtml = replace("Message1", _BET_PROPOSITION, $mainhtml);
-				$line1 = getTemplatePart("Text", $mainhtml);
-				$line1 = replace("Line", _BET.": ".$bet->getBetTitle(), $line1);
-				$line2 = getTemplatePart("Text", $mainhtml);
-				$line2 = replace("Line", _POSSIBILITY.": ".$possibility_name, $line2);
-				$line3 = getTemplatePart("Text", $mainhtml);
-				$line3 = replace("Line", "Credits: ".$credits, $line3);
-				$line4 = getTemplatePart("Text", $mainhtml);
-				$line4 = replace("Line", _BET_UNVALID_POSSIBILITY , $line4);
-				$mainhtml = replace("Text", $line1.$line2.$line3.$line4, $mainhtml);
-				$mainhtml = replace("Link1", "<a href=\"index.php\">"._BET_BACK."</a>" , $mainhtml);
-			}	
+			$low_balance = false;
 		}
-		else {
-			// balance not high enough
-			$mainhtml = replace("Message1", _BET_FALSE_INPUTS, $mainhtml);
+	
+		$session->unlockF5();
+		$id_array = explode("#",$pos);
+		$bet_id = $id_array[0];
+		$possibility_id = $id_array[1];
+		$pos = $bet_id."%23".$possibility_id;
+		$bet = $db_mapper->getBet($bet_id);
+		
+		// check time
+		if ($bet->getBetEndTime() > strtotime(time())){
+			$wrong_time = false;
+		}
+
+		// wrong possibility or low balance or wrong time
+		if ($low_balance || $wrong_pos || $wrong_time){	
+			$id_array = explode("#",$pos);
+			$bet_id = $id_array[0];
+			$possibility_id = $id_array[1];
+			$bet = $db_mapper->getBet($bet_id);
+		
+			$possibility_name = $db_mapper->getPossibilityNameFromId($possibility_id);
+			$mainhtml = replace("Message1", _BET_PROPOSITION, $mainhtml);
+			$line1 = getTemplatePart("Text", $mainhtml);
+			$line1 = replace("Line", _BET.": ".$bet->getBetTitle(), $line1);
+			$line2 = getTemplatePart("Text", $mainhtml);
+			$line2 = replace("Line", _POSSIBILITY.": ".$possibility_name, $line2);
+			$line3 = getTemplatePart("Text", $mainhtml);
+			$line3 = replace("Line", "Credits: ".$credits, $line3);
+			$line4 = getTemplatePart("Text", $mainhtml);
+			$line4 = replace("Line", _BET_UNVALID_POSSIBILITY , $line4);
+			$mainhtml = replace("Text", $line1.$line2.$line3.$line4, $mainhtml);
 			$mainhtml = replace("Link1", "<a href=\"index.php\">"._BET_BACK."</a>" , $mainhtml);
+			
+			// TODO distinguish error
+			// balance not high enough
+			// $mainhtml = replace("Message1", _BET_FALSE_INPUTS, $mainhtml);
+			// $mainhtml = replace("Link1", "<a href=\"index.php\">"._BET_BACK."</a>" , $mainhtml);
 		}
+		// success
+		else {	
+			$quote = $db_mapper->getQuoteFromPosId($possibility_id, $credits);
+			$win_credits = round(($quote * $credits), 0); 
+			$new_balance = $user->getBalance() - $credits;
+			$possibility_name = $db_mapper->getPossibilityNameFromId($possibility_id);
+			$mainhtml = replace("Message1", _BET_PROPOSITION, $mainhtml);
+			$line1 = getTemplatePart("Text", $mainhtml);
+			$line1 = replace("Line", _BET.": ".$bet->getBetTitle(), $line1);
+			$line2 = getTemplatePart("Text", $mainhtml);
+			$line2 = replace("Line", _POSSIBILITY.": ".$possibility_name.": ".$bet->getBetTitle(), $line2);
+			$line3 = getTemplatePart("Text", $mainhtml);
+			$line3 = replace("Line", "Credits: ".$credits, $line3);
+			$line4 = getTemplatePart("Text", $mainhtml);
+			$line4 = replace("Line", _BET_WIN_CASE.$win_credits." Credits" , $line4);
+			$line5 = getTemplatePart("Text", $mainhtml);
+			$line5 = replace("Line", _BET_BALANCE_AFTER.$new_balance." Credits" , $line5);
+			$line6 = getTemplatePart("Text", $mainhtml);
+			$line6 = replace("Line", _BET_ASSICURATION , $line6);
+			$mainhtml = replace("Text", $line1.$line2.$line3.$line4.$line5.$line6, $mainhtml);
+			$mainhtml = replace("Link1", "<a href=\"betchecker.php?pos=$pos&cd=$credits\">"._BET_CONTINUE."</a>" , $mainhtml);
+			$mainhtml = replace("Link2", "<a href=\"index.php\">"._BET_DELETE."</a>" , $mainhtml);
+		}	
 	}
+	else if ($cont_flag == 2){
+		// show confirmation
+		$pos = htmlspecialchars($_GET['pos']);
+		$credits = htmlspecialchars($_GET['cd']);
+		
+		// check posibility
+		if(checkPossibility($db_mapper, $user, $pos)){
+			$wrong_pos = false;
+		}
+		
+		// check balance
+		if(checkBalance($user, $credits)){
+			$low_balance = false;
+		}
+		
+		$id_array = explode("#",$pos);
+		$bet_id = $id_array[0];
+		$pos_id = $id_array[1];
+		$bet = $db_mapper->getBet($bet_id);
+		
+		// check time
+		if ($bet->getBetEndTime() > strtotime(time())){
+			$wrong_time = false;
+		}
+		
+		$bet->execute($pos_id, $credits, $user);
+		$pos_name = $db_mapper->getPossibilityNameFromId($pos_id);
+		
+
+		$mailer->send_email(_BET_SUB, _BET_MSG."\n"
+				._BET.": ".$bet->getBetTitle()."\n"."\n"
+				._POSSIBILITY.": ".$pos_name."\n"
+				._CREDITS.": ".$credits."\n", $user->getEmail());
+		
+		$session->lockF5();
+		
+		$mainhtml = replace("Message1", _BET_ACCEPTED, $mainhtml);
+		$mainhtml = replace("Text", "", $mainhtml);
+		$mainhtml = replace("Link1", "", $mainhtml);
+		$mainhtml = replace("Link2", "<a href=\"index.php\">"._BET_BACK."</a>" , $mainhtml); 
+		}
+		else if ($cont_flag == 3){
+			// office closed or wrong time
+			$mainhtml = file_get_contents("tpl/closed.inc");
+			$mainhtml = replace("Message1", _BET_OFFICE_CLOSED, $mainhtml);
+			$mainhtml = replace("Back", _BACK_HOME, $mainhtml);
+		}
 	else {
 		// wrong values or empty fields
 		$mainhtml = replace("Message1", _BET_FALSE_INPUTS, $mainhtml);

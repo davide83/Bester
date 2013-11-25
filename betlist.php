@@ -53,6 +53,7 @@ require_once ('modules/catmenu.php');
 require_once ('modules/title.php');
 
 // 5. mainhtml
+$bet_html_part = "";
 if (($user->getStatus() == "administrator") || ($user->getStatus() == "betmaster")){
 	$bets = $db_mapper->getAllBets();
 
@@ -87,7 +88,7 @@ if (($user->getStatus() == "administrator") || ($user->getStatus() == "betmaster
 					"<p><a href=\"profile_edit.php\">"
 					._EDIT_PROFILE."</a></p>", $user_area_part);
 			if (($user->getStatus() == "betmaster") || ($user->getStatus() == "administrator")){
-				$user_area_part = replace("CreateBet", "<p><a href=\"insertbet.php\">"._INSERT_BET."</a></p>", $user_area_part);
+				$user_area_part = replace("CreateBet", "<p><a href=\"insertbet.php\">"._INSERT_BET_MAIN_TITLE1."</a></p>", $user_area_part);
 			}
 			else {
 				$user_area_part = replace("CreateBet", "", $user_area_part);
@@ -205,7 +206,7 @@ if (($user->getStatus() == "administrator") || ($user->getStatus() == "betmaster
 									($user->getStatus() == "administrator"))){
 							$freeze_area_part = getTemplatePart("FreezeArea",$possibilities_html_part);
 							$freeze_area_part = replace("BetID", $bets[$i]->getBetId(), $freeze_area_part);
-							$freeze_area_part = replace("PossibilityID", $current_possibilitiy_id, $freeze_area_part);
+							//$freeze_area_part = replace("PossibilityID", $current_possibilitiy_id, $freeze_area_part);
 							if (($winning_possibility == "") && ($bet_is_past == true)){
 								$possibilities_html_part = replace("FreezeArea", $freeze_area_part, $possibilities_html_part);
 							}
@@ -245,7 +246,7 @@ if (($user->getStatus() == "administrator") || ($user->getStatus() == "betmaster
 		$mainhtml = replace("Bets", $bet_html_part, $mainhtml);
 
 		// replace the main Title
-		$mainhtml = replace("NewBet", _INSERT_BET, $mainhtml);
+		$mainhtml = replace("NewBet", _INSERT_BET_MAIN_TITLE1, $mainhtml);
 		$mainhtml = replace("MainTitle", _BET_LIST, $mainhtml);
 	}
 }

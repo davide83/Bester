@@ -1,0 +1,6 @@
+Warning: mysql_connect(): Access denied for user 'www-data'@'localhost' (using password: NO) in /mnt/sda5/Webs/active/betster/class/DbMapper.class.php on line 23 Database error, contact your admin
+
+Error
+
+A database error occured, please contact the administrator.
+

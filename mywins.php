@@ -61,6 +61,10 @@ $mainhtml = replace("MainTitle", _MY_WINS, $mainhtml);
 // in case of a logged in user
 // replace the login fields with the user in case of a logged in user menu or reverse
 //------------------------------------------------------------------------------------
+$nav_html_part = "";
+$wins_html_part = "";
+$nav_area = "";
+$num_pages = 0;
 if ($session->getState()){
 	$user = $db_mapper->getUser($session->getUsername());
 
@@ -68,17 +72,14 @@ if ($session->getState()){
 	$size = $bstConfig_wins_disp;
 	$wins_num = count($wins);
 
+	if (isset($_GET["pn"]) && is_numeric(htmlspecialchars($_GET['pn']))) {
+		$page_num = htmlspecialchars($_GET['pn']);
+	}
+	else {
+		$page_num = 1;
+	}
+	
 	if ($wins_num >= 1){
-		// page number
-		if (isset($_GET['pn'])){;
-			$page_num = htmlspecialchars($_GET['pn']);
-			if (!(is_numeric($_GET['pn']))){
-				$page_num = 1;
-			}
-		}
-		else {
-			$page_num = 1;
-		}
 
 		$num_pages = ceil($wins_num/$size); 
 		if ($num_pages < 1){

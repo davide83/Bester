@@ -54,7 +54,26 @@ require_once ('modules/title.php');
 if (($user->getStatus() == "administrator") || 
 	($user->getStatus() == "betmaster")){
 
-	$ac = htmlspecialchars(htmlspecialchars($_GET['ac']));
+	if (isset($_GET['ac'])) {
+		$ac = htmlspecialchars(htmlspecialchars($_GET['ac']));
+	}
+	else {
+		$ac = "";
+	}
+		
+	if (!isset($_POST['go1']))
+		$_POST['go1'] = "";
+
+	if (!isset($_POST['go2']))
+		$_POST['go2'] = "";
+
+	if (!isset($_POST['del']))
+		$_POST['del'] = "";
+
+	if (!isset($_POST['back2']))
+		$_POST['back2'] = "";	
+	
+	$msg = "";
 
 	// after the first "go"-click
 	if ($_POST['go1'] == _GO){

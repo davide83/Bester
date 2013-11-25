@@ -25,6 +25,7 @@ require_once("class/User.class.php");
 require_once("class/Category.class.php");
 require_once("class/Bet.class.php");
 require_once("class/Logger.class.php");
+require_once("class/Mailer.class.php");
 require_once("class/Transaction.class.php");
 require_once("class/DbMapper.class.php");
 require_once("class/Site.class.php");
@@ -103,11 +104,13 @@ if (($session->getState()) &&
 			$loosers_email .= $looser->getEmail().", ";
 		}
 		$pos_name = $db_mapper->getPossibilityNameFromId($pos_id);
-		Mailer(_WIN_SUB, _WIN_MSG."\n"."\n"
+		
+		$mailer->send_mail(_WIN_SUB, _WIN_MSG."\n"."\n"
 				._BET.": ".$bet->getBetTitle()."\n"
 				._POSSIBILITY.": ".$pos_name."\n"
 				._QUOTE.": ".$quote."\n", $winners_email);
-		Mailer(_LOOSE_SUB, _LOOSE_MSG."\n"."\n"
+		
+		$mailer->send_email(_LOOSE_SUB, _LOOSE_MSG."\n"."\n"
 				._BET.": ".$bet->getBetTitle()."\n"
 				._POSSIBILITY.": ".$pos_name."\n"
 				, $loosers_email);

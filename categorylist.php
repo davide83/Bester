@@ -63,7 +63,7 @@ $mainhtml = replace("MainTitle", _CATEGORY_LIST, $mainhtml);
 $mainhtml = replace("MainTitle", _CATEGORY_LIST, $mainhtml);
 //$mainhtml = replace("Message1", _CATEGORY_EDIT_INFO, $mainhtml);
 
-
+$cat_html_part = "";
 if (($user->getStatus() == "administrator") ||
 	($user->getStatus() == "betmaster")){
 	
@@ -73,6 +73,16 @@ if (($user->getStatus() == "administrator") ||
 	$size = $bstConfig_cat_disp;
 	$cat_num = count($categories);
 
+	// page number
+	if (isset($_GET["pn"]) && is_numeric(htmlspecialchars($_GET['pn']))) {
+		$page_num = htmlspecialchars($_GET['pn']);
+	}
+	else {
+		$page_num = 1;
+	}
+
+	$nav_area = "";
+	$num_pages = "";
 	if ($cat_num >= 1){
 		
 		// shifting category positions
@@ -86,17 +96,6 @@ if (($user->getStatus() == "administrator") ||
 		// update after shifting	
 		$categories = $db_mapper->getAllCategories();
 	
-		
-		// page number
-		if (isset($_GET['pn'])){
-			$page_num = htmlspecialchars($_GET['pn']);
-			if (!(is_numeric($_GET['pn']))){
-				$page_num = 1;
-			}
-		}
-		else {
-			$page_num = 1;
-		}
 
 		$num_pages = ceil($cat_num/$size); 
 		if ($num_pages < 1){

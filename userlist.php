@@ -53,6 +53,7 @@ require_once ('modules/catmenu.php');
 require_once ('modules/title.php');
 
 // 5. mainhtml
+$user_html_part = "";
 if (($session->getState()) && 
 	(($user->getStatus() == "administrator") ||
 	 ($user->getStatus() == "betmaster"))) {
