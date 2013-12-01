@@ -88,7 +88,7 @@ if ($session->getState()){
 	if (!isset($_POST['insert1']))
 		$_POST['insert1'] = "";
 	
-	// print $db_mapper->checkIfUserInDB($session->getUsername(), "baidl");
+
 	if (htmlspecialchars($_POST['insert1']) == _EDIT){
 		$password_old = $_POST['pwd_old'];
 		$password1 = $_POST['pwd1'];

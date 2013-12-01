@@ -1,6 +1,7 @@
 <?php
 $menu = file_get_contents("tpl/menu.inc");
 
+/*
 if (($session->getState()) && 
 	($user->getStatus() == "administrator")){
 	$add = getTemplatePart("AddSite", $menu);
@@ -9,6 +10,7 @@ if (($session->getState()) &&
 else {
 	$menu = replace("AddSite", "", $menu);
 }
+*/
 
 $i = 0;
 $item = "";

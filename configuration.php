@@ -18,7 +18,7 @@ $bstConfig_initial_credits = 20000;
 $bstConfig_state = "open";
 
 // language of your bet office (english or german)
-$bstConfig_lang = "german";
+$bstConfig_lang = "english";
 
 // how many bets should be displayed on one site
 $bstConfig_bet_disp = 10;

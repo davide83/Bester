@@ -4,8 +4,8 @@ Menu:
 </p>
 <p>
 <!-- #AddSite -->
-<a href="addsite.php">
-<img src="/images/icons/new16.png">
+<!-- <a href="addsite.php"> -->
+<!-- <img src="/images/icons/new16.png"> -->
 </a><br />
 <!-- AddSite# -->
 

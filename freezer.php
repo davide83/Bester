@@ -36,6 +36,7 @@ require_once("class/phpmailer.class.php");
 // objects
 $session = new Session;
 $logger = new Logger;
+$mailer = new Mailer;
 $db_mapper = new DbMapper;
 $user = new User("", "", "", "", "", "", "");
 
@@ -67,7 +68,7 @@ if (($session->getState()) &&
 		$bet = $db_mapper->getBet($bet_id);
 	}
 
-	// he is sure...
+	// he is sure...	
 	if (htmlspecialchars($_POST['set']) == _SET){
 
 		// TODO: check for errors during freezing
@@ -85,7 +86,9 @@ if (($session->getState()) &&
 		$loosers = $db_mapper->getLoosingUsers($bet_id);
 		$quote = $db_mapper->getQuoteFromPosId($pos_id, 0);
 
+		
 		// TODO: make it in the Db_Mapper Class
+		$winners_email = "";
 		foreach ($winners as $winner) {
 
 			$user_id = $winner->getUserId();
@@ -100,12 +103,14 @@ if (($session->getState()) &&
 			$winners_email .= $winner->getEmail().", ";
 		}
 
+		$loosers_email = "";
 		foreach($loosers as $looser){
 			$loosers_email .= $looser->getEmail().", ";
 		}
 		$pos_name = $db_mapper->getPossibilityNameFromId($pos_id);
 		
-		$mailer->send_mail(_WIN_SUB, _WIN_MSG."\n"."\n"
+		/*
+		$mailer->send_email(_WIN_SUB, _WIN_MSG."\n"."\n"
 				._BET.": ".$bet->getBetTitle()."\n"
 				._POSSIBILITY.": ".$pos_name."\n"
 				._QUOTE.": ".$quote."\n", $winners_email);
@@ -114,6 +119,7 @@ if (($session->getState()) &&
 				._BET.": ".$bet->getBetTitle()."\n"
 				._POSSIBILITY.": ".$pos_name."\n"
 				, $loosers_email);
+		*/
 	}
 
 	elseif ($_POST['cancel'] == _CANCEL){

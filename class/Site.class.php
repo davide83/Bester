@@ -42,7 +42,6 @@ class Site {
 	}
 
 	function getTitle(){
-		//return "lkhl";
 		return $this->title;
 	}
 

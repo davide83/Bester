@@ -17,8 +17,12 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  */
 
+require_once("Win.class.php");
+
 class DbMapper {
 
+	//var $win = new Win();
+	
 	function DbMapper(){
 		$connect  = mysql_connect (HOST, USER, PASSWORD) or 
 			die("Database error, contact your admin");
@@ -643,14 +647,22 @@ class DbMapper {
 		return $user_array;
 	}
 
-	// query doesn't work
+	// query doesn't work, try this:
+	/*
+	SELECT DISTINCT user . * 
+	FROM user, transactions, possibilities
+	WHERE user.id = transactions.user_id
+	AND transactions.possibilities_id = possibilities.id
+	AND possibilities.id =  '23'
+	AND possibilities.win =  'yes'
+	LIMIT 0 , 30
+	*/
 	function getWinningUsers($possibility_id){
 		$query = "SELECT DISTINCT user.*
-			FROM user, transactions, possibilities, userwins
+			FROM user, transactions, possibilities
 			WHERE user.id = transactions.user_id
 			AND transactions.possibilities_id = possibilities.id
 			AND possibilities.id = '".$possibility_id."'
-			AND userwins.possibilities_id <> possibilities.id
 			AND possibilities.win = 'yes'";
 		$result = mysql_query ($query) or error_catcher();
 		$user_array = array();

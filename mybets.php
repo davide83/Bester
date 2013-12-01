@@ -108,6 +108,7 @@ if ($session->getState()){
 		$mainhtml = replace("CreditsTitle", _CREDITS, $mainhtml);
 		$mainhtml = replace("TimeTitle", _DATE_TIME, $mainhtml);
 
+		$trans_html_part = "";
 		for ($i = $start_num; $i <= $disp_num-1; $i++ ){
 			if ($i < $trans_num){
 				$winning_possibility = $db_mapper->getWonPossibility($transactions[$i]->getBetId()); // FIXXME
